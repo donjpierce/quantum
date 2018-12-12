@@ -1,0 +1,302 @@
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pyquil</span> <span class="k">import</span> <span class="n">Program</span><span class="p">,</span> <span class="n">get_qc</span>
+<span class="kn">from</span> <span class="nn">pyquil.gates</span> <span class="k">import</span> <span class="n">H</span>
+<span class="kn">from</span> <span class="nn">pyquil.quil</span> <span class="k">import</span> <span class="n">DefGate</span>
+<span class="kn">from</span> <span class="nn">pyquil.api</span> <span class="k">import</span> <span class="n">WavefunctionSimulator</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's work with three qubits:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">qv</span> <span class="o">=</span> <span class="n">get_qc</span><span class="p">(</span><span class="s1">&#39;3q-qvm&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now let's drive an equal superposition of all possible states, using the Hadamard gate. Then let's peer into what the resultant wavefunction looks like.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">Program</span><span class="p">(</span><span class="n">H</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">H</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">H</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">wfn</span> <span class="o">=</span> <span class="n">WavefunctionSimulator</span><span class="p">()</span><span class="o">.</span><span class="n">wavefunction</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">wfn</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>(0.3535533906+0j)|000&gt; + (0.3535533906+0j)|001&gt; + (0.3535533906+0j)|010&gt; + (0.3535533906+0j)|011&gt; + (0.3535533906+0j)|100&gt; + (0.3535533906+0j)|101&gt; + (0.3535533906+0j)|110&gt; + (0.3535533906+0j)|111&gt;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Remember that since we are using 3 qubits, we expect $2^3 = 8$ possible states, with a relative normalization $\frac{1}{\sqrt{2^3}} = 0.3535533906$. So this state looks exactly as we expect. Now let's define our oracle. For this oracle, I'm going to choose state number 6 to be of interest. Remember that our matrix must be $8x8$ since we are working with three qubits ($16x16$ if we were working with four qubits, etc.).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">oracle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>                                                                                
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>                                                                                
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>                                                                                
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>                                                                                
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>                                                                                
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>                                                                                
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>                                                                                
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="p">])</span>
+<span class="n">oracle_definition</span> <span class="o">=</span> <span class="n">DefGate</span><span class="p">(</span><span class="s2">&quot;oracle&quot;</span><span class="p">,</span> <span class="n">oracle</span><span class="p">)</span>
+<span class="n">ORACLE</span> <span class="o">=</span> <span class="n">oracle_definition</span><span class="o">.</span><span class="n">get_constructor</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now let's add our oracle operator into our program, along with its definition so that pyquil knows how to use it. We want oracle to act on all three qubits, so it's pyquil instruction will be $\textsf{ORACLE(0, 1, 2)}$</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">p</span> <span class="o">+=</span> <span class="n">oracle_definition</span>
+<span class="n">p</span> <span class="o">+=</span> <span class="n">ORACLE</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>DEFGATE oracle:
+    1, 0, 0, 0, 0, 0, 0, 0
+    0, 1, 0, 0, 0, 0, 0, 0
+    0, 0, 1, 0, 0, 0, 0, 0
+    0, 0, 0, 1, 0, 0, 0, 0
+    0, 0, 0, 0, 1, 0, 0, 0
+    0, 0, 0, 0, 0, -1, 0, 0
+    0, 0, 0, 0, 0, 0, 1, 0
+    0, 0, 0, 0, 0, 0, 0, 1
+
+H 0
+H 1
+H 2
+oracle 0 1 2
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next we need to construct the Grover diffusion operator. This operator is $D = H \times (-I) \times H$, where $(-I)$ is an inversion about zero. I'm going to use the already-multiplied form, which can be found explicitly here:  htps://people.eecs.berkeley.edu/~vazirani/f04quantum/notes/lec10/lec11.pdf Let's define the Grover diffusion operator for our state (with $N = 2^n = 8$), and then add it to our program.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">diffusion</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+    <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">],</span>                                                             
+    <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">],</span>                                                             
+    <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">],</span>                                                             
+    <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">],</span>                     
+    <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">],</span>              
+    <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">],</span>     
+    <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">],</span>                                                             
+    <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  
+<span class="p">])</span>
+<span class="n">diffusion_definition</span> <span class="o">=</span> <span class="n">DefGate</span><span class="p">(</span><span class="s2">&quot;grover-diffusion&quot;</span><span class="p">,</span> <span class="n">diffusion</span><span class="p">)</span>
+<span class="n">DIFFUSE</span> <span class="o">=</span> <span class="n">diffusion_definition</span><span class="o">.</span><span class="n">get_constructor</span><span class="p">()</span>
+<span class="n">p</span> <span class="o">+=</span> <span class="n">diffusion_definition</span>
+<span class="n">p</span> <span class="o">+=</span> <span class="n">DIFFUSE</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>DEFGATE oracle:
+    1, 0, 0, 0, 0, 0, 0, 0
+    0, 1, 0, 0, 0, 0, 0, 0
+    0, 0, 1, 0, 0, 0, 0, 0
+    0, 0, 0, 1, 0, 0, 0, 0
+    0, 0, 0, 0, 1, 0, 0, 0
+    0, 0, 0, 0, 0, -1, 0, 0
+    0, 0, 0, 0, 0, 0, 1, 0
+    0, 0, 0, 0, 0, 0, 0, 1
+
+DEFGATE grover-diffusion:
+    -0.75, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25
+    0.25, -0.75, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25
+    0.25, 0.25, -0.75, 0.25, 0.25, 0.25, 0.25, 0.25
+    0.25, 0.25, 0.25, -0.75, 0.25, 0.25, 0.25, 0.25
+    0.25, 0.25, 0.25, 0.25, -0.75, 0.25, 0.25, 0.25
+    0.25, 0.25, 0.25, 0.25, 0.25, -0.75, 0.25, 0.25
+    0.25, 0.25, 0.25, 0.25, 0.25, 0.25, -0.75, 0.25
+    0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, -0.75
+
+H 0
+H 1
+H 2
+oracle 0 1 2
+grover-diffusion 0 1 2
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now, let's think about what we should expect of the wavefunction resulting from this program. We should expect that the program initializes an even superposition state of three qubits (therefore 8 states superimposed), that the oracle inverts the phase of one of the states by $180^\circ$ (in this case the sixth state), and that the entire state is inverted in a special way so that the inversion constructively interferes with the state the oracle selected but destructively interfered with the states the oracle did not select. So what should the output look like? Take a look:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">wfn</span> <span class="o">=</span> <span class="n">WavefunctionSimulator</span><span class="p">()</span><span class="o">.</span><span class="n">wavefunction</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">wfn</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>(0.1767766953+0j)|000&gt; + (0.1767766953+0j)|001&gt; + (0.1767766953+0j)|010&gt; + (0.1767766953+0j)|011&gt; + (0.1767766953+0j)|100&gt; + (0.8838834765+0j)|101&gt; + (0.1767766953+0j)|110&gt; + (0.1767766953+0j)|111&gt;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Successfully, our program increased the amplitude of the oracle's state and decreased the amplitudes of the other states. Therefore when this wavefunction is measured, the qubits will have a higher probability of being in the configuration $|101&gt;$ than being in any other configuration. The more we iterate over Grover's algorithm, the higher the oracle state's amplitude will be.</p>
+
+</div>
+</div>
+</div>
+ 
+
